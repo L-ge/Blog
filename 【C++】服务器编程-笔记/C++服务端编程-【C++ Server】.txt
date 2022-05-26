@@ -1,0 +1,1491 @@
+一、网络基础
+1、IP和TCP首部无扩展的时候是20字节。
+以太网最短是46字节，最大mtu是1500字节。
+
+2、accept函数return的时候就是第三次握手完成的时候。
+connect函数return的时候就是第二次握手完成的时候。
+
+3、服务器开发一般要关闭TCP的Nagle算法，系统默认是开启的。
+一般不要开启keepalive定时器，应该由上层去实现心跳。
+
+二、Linux基础
+1、Linux下的目录一般放什么东西：
+bin：可执行文件
+boot：一般放启动的文件
+dev：设备
+etc：大部分的配置文件
+home：主目录，每个用户自己的目录
+lib：库目录
+lib64：64位的库的目录
+mnt：挂载目录
+opt：可选目录，用户自己安装的程序可以放在这里面，例如编译器clang。
+root：根目录
+sbin：系统的执行文件目录
+usr：自己安装的软件一般放在这里
+tmp：放临时文件的目录，系统重启的时候里面的东西会删掉的
+
+2、输入ls -l命令打印的东西表示什么意思：
+drw-rw-r-- 2 username1 username2 4096 Aug 7 05:24 DeskTop
+
+文件属性：drw-rw-r--:
+d表示目录，普通文件是-，软链接是l。
+后面每三位为一组，表示这个文件拥有者的权限。
+r：读。w：写。x：可执行(文件)、可进入(目录)。
+第一组rw-：文件创建者的权限。
+第二组rw-：同一组用户的权限。
+第三组r--：其他用户的权限。
+
+2：表示硬链接数，类似于智能指针的引用计数器。
+username1：表示文件归属者。
+username2：归属组。
+4096：大小。
+Aug 7 05:24：上一次修改的时间。
+
+3、一般的文件命令：
+ps -e | grep ssh：看ssh服务有没有安装
+sudo apt install openssh-server：安装ssh服务
+who：看谁连在这机子上
+sudo apt-get update：一般安装好系统后的更新远端服务器的资源信息
+sudo apt-get upgrade：看看有没有什么包需要更新
+
+sudo apt-get dist-upgrade：非常重要版本的更新，比如内核版本的更新
+
+pwd：打印当前目录
+
+man pwd：pwd这个命令怎么用，也就相当于是帮助文档
+
+ls：看当前目前下有哪些文件，也可以直接用ll
+
+cd：切换目录
+
+touch abc.txt：生成一个字节大小为0的空文件。如果这个文件已经存在，则修改它的修改时间。
+
+ls a*：列出a开头的文件
+ls *.txt：列出txt格式的文件。*表示任意个字符。
+ls a?b.txt：一个?表示一个字符。
+
+cp aaa.txt aaa.bak：拷贝aaa.txt，生成一个aaa.bak
+
+ls -sail *bak；i选项表示打印文件在操作文件上的node(在硬盘上的位置)。
+
+cp -i abc.txt aaa.txt：-i表示当aaa.txt存在的时候，询问是否覆盖掉aaa.txt
+
+cp -l abc.txt aaa.txt：-l表示abc.txt和aaa.txt指向的是同一个东西。硬链接数会加1。硬链接不可以跨文件系统。
+
+cp -s abc.txt aaa.txt：-s表示软链接，相当于快捷方式。软链接可以跨文件系统。
+
+mkdir docTmp：创建一个目录docTmp。
+
+rm abc.txt：删除文件。
+
+rmdir docTmp：删除空目录。
+
+rm -r：递归删除目录。
+
+stat aaa.txt：详细地列出文件的属性信息。
+
+file aaa.txt：列出非空文件的文件类型。
+
+wget -c http://mirrors.163.com/xxxxx：从远处的机器拉文件到本地
+
+cat aaa.txt：看文件的内容
+more aaa.txt：看文件的内容，一页一页地往下看
+less aaa.txt：看文件的内容，可以上下翻页
+tail aaa.txt：看文件的尾部的10行。常用于看日志文件。
+tail -n 3 aaa.txt：看文件的尾部的3行。
+tail -f -n 3 aaa.txt：实时查看文件的尾部的3行。
+head aaa.txt：看文件的头部的10行。
+
+mv aaa.txt bbb.txt：重命名一个文件
+
+clear：清屏
+
+ls ~/sources.list：~表示当前用户目录，输入cd就可以到这个目录
+
+sudo !!：以sudo方式执行上一条指令
+
+cd ..：返回上一次目录
+
+mkdir -p a/b/c：递归创建a、b、c目录
+
+4、更新软件源的方法：
+wget -c http://mirrors.163.com/xxxxx/sources.list：-c表示如果本地下载中断，下次再输入该命名时，会从上一次继续。
+cd /etc/apt
+cat sources.list
+ls -l sources.list
+sudo cp sources.list sources.list.bak
+sudo cp ~/sources.list .
+cat sources.list
+sudo apt-get update
+sudo apt-get upgrade
+
+5、一般的查看系统资源的命令：
+
+ps：输出当前控制台用户拥有的进程。
+
+ps -ef：-e显示所有的进程。-f显示完整的输出。PPID表示进程的父进程。C表示CPU占用率。STIME表示进程启动的系统时间。TIME表示该进程累计使用的CPU时间。
+
+ps -axgl：a显示所有的。l显示全部信息。VSZ表示使用的内存，单位KB。RSS表示使用的物理内存。
+
+ps --forest：显示进程数
+
+top：相当于任务管理器，实时显示系统资源占用情况。PR表示进程的级别。VIRT表示虚拟内存。RES表示物理内存。
+
+sudo apt-get install htop:更好用的htop命令，比top好看。
+
+ps aux | grep top
+kill -s INT 1608：给PID为1608的程序发送中断信号。优雅地退出程序
+ps aux | grep top
+
+kill -9：强杀程序
+killAll：杀掉一批程序
+
+df -h：查看磁盘空间
+
+du -h：目录所在的磁盘空间
+
+6、其他命令：
+
+grep：一般用于查看日志。
+grep myName aaa.txt：打印aaa.txt中出现了myName字符串的行
+
+grep -c myName aaa.txt：打印aaa.txt中出现了myName字符串行的行数
+
+grep -v myName aaa.txt：打印aaa.txt中没有出现myName字符串的行
+
+grep -n myName aaa.txt：打印aaa.txt中出现了myName字符串的行和行号
+
+grep my*ame aaa.txt：打印aaa.txt中出现了my*ame(正则)字符串的行
+
+ps | grep bash：|表示管道，ps的输出作为grep的输入。
+
+sudo apt-get install zip
+zip
+unzip
+tar
+
+tar -xvf xxxxx.tar.gz：解压
+
+printenv：查看全局环境变量有哪些。
+echo $PATH：打印环境变量PATH。冒号分割。
+printenv | grep PATH：打印环境变量PATH
+
+set | head：查看局部环境变量有哪些，打印前10行。
+
+创建局部的变量：
+test=hello
+echo $test
+
+创建子bash：
+bash
+echo $test：啥也没打印
+exit
+echo $test：打印hello
+export test：在子bash也能显示
+
+unset test：干掉刚刚设置的环境变量test。
+
+chmod +x aaa.sh：添加可执行权限。
+chmod -w aaa.sh：减掉写权限。
+
+chown：改变所有者。
+
+shell脚本的第一行注释是有意义的，意思是用/bin/sh对整个脚本进行处理。
+例如，
+#! /bin/sh
+who
+
+cat aaa.cpp >> bbb.cpp：将aaa.cpp的内容追加到bbb.cpp的结尾。
+
+7、怎么拷贝远端机器的文件？用scp命令。
+sudo apt-get install git
+git --version
+scp --version
+scp sourceName@192.168.xxx.xxx:/home/sourceName/aaa.txt .:以sourceName登录远端机器并拷贝远端机器192.168.xxx.xxx的文件/home/sourceName/aaa.txt到当前目录下
+
+8、sudo apt-get install make：安装make。
+sudo apt-get install cmake：安装cmake。
+sudo apt-get install clang：安装clang。
+
+clang++ aaa.cpp：编译aaa.cpp
+
+9、设置环境变量
+vim ~/.bashrc
+添加PATH=$PATH:/opt/llvm/bin
+source ~/.bashrc
+echo $PATH
+
+10、通过makefile编译。但实际项目中应该用cmake。
+自己写makefile的话，当一个类包含头文件的时候要全部链接，例如，
+test002.o:test002.cpp test0021.h
+其中，test002.cpp包含了test0021.h。
+
+vim makefile
+test002.cpp生成一个test002的可执行文件。内容如下：
+一个文件的时候：
+test002:test002.o
+	clang++ -o test002 test002.o
+test002.o:test002.cpp
+	clang++ -c -o test002.o test002.cpp 
+
+test0021.h、test0021.cpp、test002.cpp生成一个test002的可执行文件。test002.cpp调用test0021里面的方法。
+多个文件的时候：
+test002:test002.o test0021.o
+	clang++ -o test002 test002.o test0021.o
+test002.o:test002.cpp test0021.h
+	clang++ -c -o test002.o test002.cpp
+test0021.o:test0021.cpp test0021.h
+	clang++ -c -o test0021.o test0021.cpp
+
+然后
+make
+屏幕输出
+clang++ -c -o test002.o test002.cpp
+clang++ -o test002 test002.o
+
+time ./test002：计算消耗cpu的时间和程序运行所占用的时间。
+
+11、sudo apt-get install xxxxx
+Ubuntu16.04版本之后用sudo apt install xxxxx就行，去掉-get。
+
+三、vim基础
+1、学习vim：
+vim --version：查看vim的版本
+
+默认状态下vim是normal状态，你的键盘输入的是命令，而不是输入的文本。
+
+敲入":"，vim会认为你要输入特殊命令，例如“:wq”、强制退出":q!"。
+敲入":q"，退出vim，文件有变化会认为退出失败。
+敲入":q!"，强制退出vim，不存盘。
+敲入":x"，存盘并退出(有变化的时候才存盘)。
+w是存盘、q是退出。
+":w test.cpp"，写入文件并命名为test.cpp。
+敲入"ZZ"，存盘并退出，光标不移动到底部。
+
+在normal状态下，按i(光标前)，a(光标后)，o(光标下一行)，O(光标上一行)，A(光标行尾部)。
+按i键，从normal状态进入insert编辑状态。
+
+按ESC键进入到normal状态。
+当你不确认自己所在状态的时候，按ESC键回到normal状态。
+
+normal状态下使用hjkl移动光标，hl是左右，jk是下上。也可以使用方向键。
+
+在编辑状态，与一般编辑器一样用退格键或者删除键删除字符。
+在normal状态，用x删除光标所在字符。
+
+在normal状态，用dd删除光标所在的整个一行。用.重复上一个有改变文本的命令(默认的单行移动光标不算)。
+
+在normal状态，敲入":help"得到帮助文档。
+
+在normal状态，输入0向左移动到行首部的第一个可操作字符，输入$向右移动到行尾部的最后一个可操作字符。
+
+在normal状态，输入^移动到行首部第一个非blank字符的位置，输入g_移动到行尾部最后一个非blank字符的位置，所谓blank字符就是空格、tab、换行、回车等。
+
+在normal状态，输入o在当前行后插入一个新行，输入O在当前行前插入一个新行。
+
+在normal状态，输入"/查找的字符+回车"，向下移动到第一个查找字符位置的位置，如果查找的字符不存在，光标不移动。输入"?查找的字符+回车"，向上移动到第一个查找字符位置的位置，如果查找的字符不存在，光标不移动。
+
+在normal状态，输入":set hlsearch"高亮查找的结果,光标在第一个出现字符的位置。输入n向下移动到上次查找字符组的下一个位置。输入N向上移动到上次查找字符组的下一个位置。
+
+在normal状态，输入"ddp"交换两行的位置。dd是删除，p是粘贴。ddp实际上是两个命令。
+
+在normal状态，输入"yy"复制光标所在行的内容。y是yank复制的意思。
+
+在normal状态，输入u相当于ctrl+z。
+
+n<command>：重复某个命令n次。例如。2dd删除光标所在行及其以下一行。
+
+在normal状态，输入":set number"显示行号。
+
+2G跳转到文本第2行。":2加回车“也是一样的实现。
+
+gg跳转到文本第1行。G跳转到文本最后一行。
+
+w到下一个单词的开头，e到下一个单词的结尾。
+W到下一个单词块的开头。
+
+%光标移动到匹配括号(包括()、{}、[])的地方，常用于匹配大括号。
+
+*匹配光标所在的单词(只会匹配完整的单词)，移动光标到下一个匹配单词。
+#匹配光标所在的单词(只会匹配完整的单词)，移动光标到上一个匹配单词。
+
+在normal状态，按v进入visual模式，可以移动光标选择范围，运行命令是针对选项范围的。相当于windows按住鼠标左键选中一片区域。
+
+在normal状态，按fx到该行下一个为x的字符处。按tx到该行x前的第一个字符。按Fx到该行上一个为x的字符处。按Tx到该行前面x前的第一个字符。
+
+用dtx删除当前光标到x字符的内容。
+
+在normal状态，光标在两个""之间，按vi"会选择两个""之间不包含引号的内容。按va"会选择两个""之间包含引号的内容。
+
+在normal状态，按ctrl v进入visual block模式(windows进入这个可视化块模式是按ctrl q)。按j选择行，然后按大写I进入插入模式，然后在某一行输入你要输入的内容。然后按esc，然后会在刚刚选中的块中的每一行加入输入的内容。一般用于多行一起加//注释。
+如果想去掉多行的//注释，按ctrl v进入visual block模式，然后按l右移、j下移选中，然后按d删除。
+
+在insert模式下，输入一个词的开头，然后按ctrl p或者ctrl n来提示，相当于代码自动补全功能。
+
+在visual模式下，选中行，然后按=自动格式对齐前一行，相当于代码自动缩进。
+
+在normal状态，按shift v进入visual line模式后，如果按上下键，则每次是选中一整行。
+
+在normal状态，按J将下一行代码追加到本行的结尾处，相当于合并两行代码变成一行。
+
+在normal状态，输入:vsplit进行左右分屏。输入split进行上下分屏。输入ctrl w w 移动光标到另一边。输入:hide隐藏。
+
+vim aaa.txt bbb.txt编辑两个文件。
+此时打开的是aaa.txt。
+然后在normal状态，输入:vsplit进行左右分屏。
+然后输入:b bbb.txt打开bbb文件。
+
+shell命令vimtutor是帮助文档。
+
+在normal状态，输入e: bbb.txt则打开bbb.txt文件。
+
+2、怎么配置vim?
+配置文件.vimrc放在/home/username目录下面。
+
+例如在.vimrc文件新增
+:set number
+则下次打开vim的时候会自动补上行号了。
+
+set nocompatible：不兼容旧的vi命令
+set noerrorbells：有错误时不响铃
+set showmatch：高亮匹配的括号
+set ignorecase：查到的时候忽略大小写
+set incsearch：查到的时候如果匹配，光标自动跳过去
+set tabstop=2：设置一个tab键是两个空格
+set autowrite：表示自动存盘
+set cursorline：突出显示当前行
+set colorcolume=82：在第82列显示一条竖线(一般一行代码不应该超过80个字符)
+set autochdir：当编辑不同文件的时候，自动切换当前目录。
+
+四、C++语言
+1、下面这种情况会由于[]的使用而类A没有默认构造函数而编译不通过。
+#include <QCoreApplication>
+#include <QDebug>
+class A
+{
+public:
+    A(int nValue) : m_nValue(nValue)
+    {
+
+    }
+
+private:
+    int m_nValue;
+};
+
+int main(int argc, char *argv[])
+{
+    QCoreApplication a(argc, argv);
+
+    std::map<int, A> mapTmp;
+    //mapTmp[1] = A(1);     编译不通过
+    mapTmp.insert({1, A(1)});
+
+    return a.exec();
+}
+
+2、注意无符号整数和有符号整数的比较。
+有符号整数会转换为无符号的整数，比如-1。
+
+std::size_t unsignedIntValue = 10;
+int signedIntValue = -1;
+if(signedIntValue > unsignedIntValue)
+	qDebug() << "-1>10";		// 输出
+else
+	qDebug() << "-1<=10";   
+
+建议使用有符号的整数。	
+
+3、int nRet = func(new classA(), new classB());
+这种写法是不安全的，因为有可能先给classA分配资源，然后再给classB分配资源，
+最后才调用classA的构造函数和classB的构造函数。
+如果在调用classA构造函数的过程中崩溃了，那么分配给classA的资源可以被释放掉，但是分配给classB的资源就没法释放了。
+
+4、
+void funcTest1(int* pValue)
+{
+    pValue = new int(1);
+}
+void funcTest2(int* &pValue)
+{
+    pValue = new int(1);
+}
+int main(int argc, char *argv[])
+{
+    QCoreApplication a(argc, argv);
+
+    int* pValue = nullptr;
+    funcTest1(pValue);
+    qDebug() << "pValue1: " <<pValue;
+	funcTest2(pValue);
+	qDebug() << "pValue2: " <<pValue;
+
+    return a.exec();
+}
+
+5、C++只有两种main函数的声明：
+int main()
+int main(int argc, char** argv)
+
+int main()
+{
+	//return 0;如果没有写，编译器会自动地加上exit(0)
+}
+
+6、关键字alignas和alignof。一个结构体如果不指明对齐方式，则是默认以最大的成员的字节数作为对齐，如果结构体为空，则是1。
+struct alignas(1) T_MyDev
+{
+	double d;
+};
+
+T_MyDev是一字节对齐。
+
+alignof(T_MyDev)的值是8，alignas(1)不生效。
+
+7、关键字and与&&的含义用法是一样的。
+if(1==a && 2==b) 
+if(1==a and 2==b)
+
+8、尽量不要将bool类型作为函数的参数，取代的方法是可以使用枚举。
+
+9、在linux平台下，char是没有正负的unsigned char 。在windows平台下是有正负的signed char。
+
+10、constexpr修饰的函数在编译期如果能算出结果就直接算出来了，如果不能直接算出来就退化成一个普通函数。
+因此一个数组用constexpr修饰的函数算出的大小作为数组的大小是可以的。
+
+11、const_cast打破const属性。但用到const_cast的代码大多不好，因为打破了一开始的承诺。
+
+12、decltype关键字的用法(比较少用,建议用auto)。
+
+struct T_MyDev
+{
+	double d;
+};
+const T_MyDev* pDev = new T_MyDev{0};
+auto d1 = pDev->d;				// d1是double类型
+decltype(pDev->d) d2;			// d2是double类型
+auto&& d3 = d2; 				// d3是d2的引用
+decltype((pDev->d)) d4 = d2;	// d4是d2的引用.多了个括号,意义就不一样了.
+
+template<typename T, typename U>
+auto add(T a, U b) -> decltype(a+b)	// C++11，后置返回类型,根据传入的参数来决定返回类型
+{
+	return a+b;
+}
+
+template<typename T, typename U>
+auto add(T a, U b)	// C++14，根据传入的参数来决定返回类型.但是有坑,因为最后的结果有没有括号会影响返回类型.
+{
+	return a+b;
+}
+
+13、dynamic_cast：把父类指针转换为子类指针。对指针和引用有着不同的处理方式。
+
+Base* b1 = new Derived();
+if(Derived* d1 = dynamic_cast<Derived*>(b1))	// true,如果转换失败的话会返回一个空指针.
+{
+	std::cout << "cast success";
+	d1->name();
+}
+
+Base b2;
+Derived& d2 = dynamic_cast<Derived&>(b2);	// 如果转换失败的话会抛出异常。因为引用没法指向空的,因为失败了的话不知道怎么处理.
+
+14、enum加上class可以避免命名冲突。当然也可以用命名空间。
+enum ColorOldWay{ Red, Green, Blue};
+ColorOldWay r = Red;
+int a = r;
+
+enum class ColorNewWay{ Red, Green, Blue};
+ColorNewWay r = ColorNewWay::Red;
+int a = static_cast<int>(r);
+
+15、能加explicit的地方就要加explicit。
+
+16、在一个类A中修饰一个函数或者一个类为friend，则这个函数或这个类允许访问这个类A的私有成员。
+但如果一个类B继承了类A，这个函数或这个类却不是B的友元。
+
+17、如果一个函数的确不会抛出异常的时候，可以修饰为noexcept。编译器会对这样的函数优化，高效地执行。
+void func() noexcept
+{
+	...
+}
+但最好不要用这个关键字，因为没法100%保证自己写的函数没有抛出异常。万一这个函数最后抛出了异常，则程序会直接崩溃掉。
+
+18、nullptr其实是一种类型。
+
+19、reinterpret_cast、static_cast、const_cast都可以用C语言类型的转换来转。但是建议使用C++语言类型的转换。
+
+20、sizeof是编译期就算出来了。
+
+21、static局部变量在多线程环境下是不安全的。
+
+22、static_assert：编译期间就发挥作用，能在编译期发现的问题最好在编译期发现。
+assert：一个宏定义，在发布版本和debug版本的表现是不一样的，在运行期间发挥作用。
+
+23、static_cast：同种类型的转换。不影响运行效率。
+
+24、有些typedef的功能可以用using来实现。建议用using。
+typedef std::map<int, int> Group;
+using Group = std::map<int, int>;
+
+25、volatile：告诉编译器对该变量不要进行优化。一般用不上。
+
+26、用类前置声明的时候，接下来的那个类只能用指针形式的，因为编译器此时不知道前置声明类的大小，此时前置声明类是不完整类型。此时也不需要include该前置声明类的头文件。但是如果这个类有需要调用该前置声明类里面函数的函数Func，则应该在这个类的cpp文件中include该前置声明类的头文件，并实现函数Func。
+
+头文件里面应当尽可能地少include头文件，尽可能地使用前置声明，否则可能会导致编译慢。
+
+当一个类需要知道用到的那个类的大小的时候，就不能仅仅用前置声明，而应该包含该类的头文件。
+
+27、如果一个类没有写拷贝构造函数和拷贝赋值函数的时候，没有写的原因是不需要，那么应该明确地告诉编译器(声明为delete)。
+
+28、对于右值来说，是不能取地址的。对于左值来说，是可以取地址的。
+
+29、右值引用。
+int& a1 = 2;	    // 2是右值，右值是不能取地址的。错误写法。
+int&& a2 = 2; 	    // a2是右值引用。正确写法。
+
+const int& a3 = 2;  // 正确写法.
+a2 = 30;			// 对右值引用重新赋值，正确写法。
+
+int b1 = 10;
+int&& b2 = b1;					// 错误写法.
+const int&& b3 = b1;			// 错误写法.
+int&& b3 = std::move(b1);		// 正确写法.
+const int&& b4 = std::move(b1);	// 正确写法.
+
+std::vector<int> func()
+{
+	std::vector<int> vecTmp(100);
+	return vecTmp;
+}
+auto vec = func();
+
+30、MyClass里面有拷贝构造函数,注意参数一定要加const。
+class MyClass
+{
+public:
+	~MyClass(){
+		if(nullptr!=m_pValue){
+			delete m_pValue;
+			m_pValue = nullptr;
+		}
+	}
+	MyClass(const MyClass& rhs){
+		m_pValue = new int(*(rhs.m_pValue));
+	}
+	...
+	MyClass(MyClass&& rhs){			// 也就是重载拷贝构造函数.
+		m_pValue = rhs.m_pValue;
+		rhs.m_pValue = nullptr;
+	}
+	MyClass& operator=(MyClass&& rhs){
+		if(&rhs == this)	return *this;	//移动赋值函数要考虑自赋值的情况.
+		delete m_pValue;
+		m_pValue = rhs.m_pValue;
+		rhs.m_pValue = nullptr;
+		return *this;
+	}
+	
+private:
+	int* m_pValue;
+}
+MyClass a;			// a是一个左值。其实右值一切特征，左值都有。
+MyClass b = std::move(a);	// 告诉编译器把a变成一个右值。此时将调用MyClass的拷贝构造函数，就算std::move(a)返回的是MyClass&&，但是可以转换为const的引用，注意不可以转换为引用。也就是说我们可以取临时变量的const引用，才不能取引用。
+
+其实当MyClass没有定义移动构造函数的时候，
+MyClass b = a;这种写法和上面那种是一样的。也就是说，如果没有定义MyClass(MyClass&& rhs)这个函数，那么std::move的作用就退化了。
+
+std::move的含义就是把右边临时对象的一些资源直接移到左边来，而不用重新去new。
+但像上面的std::move(a);之后，就不能再使用a了，因为a的资源都移交给b了。
+
+31、编译器默认生成的析构函数是inline的。这样子会让析构函数进行代码展开。我们可以自己声明析构函数，然后在cpp文件实现，从而阻止这种行为。
+
+绝对不要在析构函数里面抛出异常。编译器会自动地把析构函数修饰为noexcept。
+
+可以明确地告诉编译器我们写的析构函数会抛出异常。这样的话，调用析构函数的地方就能加try-catch进行捕获。
+~MyClass() noexcept(false){
+	throw std::string("error");
+}
+
+void func(){
+	try{
+		MyClass m1;
+		//MyClass m2;
+	}
+	catch(...){
+		...
+	}
+}
+但如果MyClass父类的析构函数也noexcept(false)，并且抛出了异常，那么程序还是会崩溃掉。又或者说定义了变量m2，程序还是会崩溃掉。又或者说MyClass里面new了一个资源，而这个资源delete的位置在析构函数的throw之后，那么这个资源不会被delete掉。所以绝对不要在析构函数里面抛出异常，因为程序处理不了同时抛出两个异常的情况。
+
+32、调用std::swap函数也不要抛出异常。析构函数如果不抛出异常，swap函数基本也不会抛出异常。
+
+33、构造函数失败就应该抛出异常。
+
+34、一个类如果有可能作为基类，则它的析构函数应该被修饰为virtual。因为当父类指针指向子类对象的时候，delete父类指针，父类析构函数是virtual的，才能调用到子类的析构函数。
+
+但如果一个类不会作为基类的时候(这个类如果没有定义虚成员函数，那么这个类就算作为基类，也是和普通的类是一样的，没有必要把析构函数修饰为virtual)，就不要把析构函数修饰为virtual，否则效率会变慢。
+
+如果当父类指针指向子类对象的时候，父类指针是不能调用子类有而父类没有的那些函数的。如果我们明确地知道这个父类指针是指向某个子类对象，则可以通过以下三种方式去转换为子类指针，从而能够调用子类的函数：
+Derived* d = static_cast<Derived*>(pBase); // 不安全。如果pBase不是指向Derived对象的，则后面调用到Derived的函数的时候可能会崩溃。
+Derived* d = dynamic_cast<Derived*>(pBase);	// 类型安全。只有当pBase的确是指向Derived对象的时候，才能转，否则返回空指针.
+Derived* d = (Derived*)(pBase);	// 不安全。如果pBase不是指向Derived对象的，则后面调用到Derived的函数的时候可能会崩溃。
+
+如果不想把基类的析构函数修饰为virtual，则应该把基类的析构函数声明为protected的。这样子外部就没法使用基类指针的形式操作多态，但是仍然可以使用多态。
+void testInfo(const Base& b){
+	b.f();
+}
+void testBase(){
+	Derived d;
+	testInfo(d);
+}
+
+35、struct默认是public继承，class默认是private继承。
+
+36、子类中如果有一个函数f需要重写父类的函数f，最好加override修饰，避免子类在书写该函数名的时候写错。
+
+37、虚函数除了可以通过指针的方式调用，也可以通过引用的方式调用。
+
+38、在父类的构造函数里面调用虚函数，调用的是父类自己定义的函数。
+在父类的析构函数里面调用虚函数，调用的是父类自己定义的函数。
+也就是说在构造函数和析构函数里面调用虚函数f，此时f不具备虚函数的特性。
+因为万一在父类的构造函数里面能够调用到子类的虚函数，而子类的虚函数里面用到了某个成员变量，在C++中，是先调用基类的构造函数再调用子类的构造函数的，此时该成员变量其实还不存在，所以就有问题了。
+
+39、建议使用以下的方式遍历容器。因为for-range效率应该会更高。
+for(auto item : vec){
+	...
+}
+for(auto& item : vec){
+	...
+}
+for(const auto& item : vec){
+	...
+}
+
+40、建议用{}进行初始化，而不用().
+class MyClass{
+public:
+	explicit MyClass(int nValue) : m_nValue(nValue){}
+private:
+	int m_nValue;
+}
+MyClass m1(1.1);	// 允许,相当于传入了1
+MyClass m2{1.1);	// 不允许,只允许向上转型,例如传入true就可以,因为true是1,占1字节,1.1是double类型,占8字节.
+
+要注意变量的初始化.
+class MyClass{
+public:
+	MyClass(int nValue1, int nValue2) 
+	: m_nValue1(nValue1), m_nValue2{nValue2}{}
+	MyClass() {}
+private:
+	int m_nValue1{};		// int的默认值就是0.
+	int m_nValue2{100};
+}
+
+五、C++智能指针基础
+1、void func(){
+	std::shared_ptr<int> a1(new int(10));
+	// 不需要delete,内存会自动地释放掉.
+}
+
+2、四种智能指针，都在#include <memory>中：
+auto_ptr：C++98的，不建议再使用.
+shared_ptr：通过引用计数实现指针共享.
+unique_ptr：一个指针只能由一个人来使用，即一份资源某一时刻只能由一个unique_ptr来管理.
+weaked_ptr：与shared_ptr搭配使用.
+
+3、shared_ptr的使用：
+std::shared_ptr<MyClass> objectPtr1(new MyClass());
+objectPtr1.use_count();	// 引用计数
+std::shared_ptr<MyClass> objectPtr2(objectPtr1);
+objectPtr2.reset();		// use_count-1
+或objectPtr2 = nullptr;	// use_count-1
+
+std::shared_ptr<MyClass> objectPtr3;
+objectPtr1.swap(objectPtr3);		//
+或std::swap(objectPtr1, objectPtr3);//
+
+auto p = objectPtr1.get();		// 获得原始指针
+p->func();
+objectPtr1->func();
+(*objectPtr1).func();	
+
+if(objectPtr1.unique())			// 效率比下面那句高.
+if(1 == objectPtr1.use_count()) // 作用同上.
+
+objectPtr1可以作为值传递(会改变引用计数),也可以作为常引用传递(不会改变引用计数).
+要注意看需求来设计函数的接口：
+void func(const MyClass& m); // func(*objectPtr1);
+void func(std::shared_ptr<MyClass> m); // func(objectPtr1);
+void func(const std::shared_ptr<MyClass>& m); // func(objectPtr1);
+
+可以自定义销毁资源的函数：
+void myDeleter(MyClass* p){
+	delete p;
+}
+std::shared_ptr<MyClass> objectPtr(new MyClass(), myDeleter);
+
+4、shared_ptr通过用weaked_ptr打破循环引用。只要当一方改用weaked_ptr就能打破。
+
+当外部有其他shared_ptr管理weaked_ptr所管理的资源的时候，weaked_ptr所指向的指针是有效的；当外部都没有shared_ptr管理weaked_ptr所管理的资源的时候，weaked_ptr所指向的指针是无效的。
+std::shared_ptr<MyClass> sharePtr(new MyClass(1));
+std::weaked_ptr<MyClass> weakPtr(sharePtr);	// sharePtr的引用计数不变
+
+auto sharePtrTmp = weakPtr.lock();	// 调用lock的时刻，如果weakPtr所管理的资源(即new MyClass())，其引用计数不为0的时候，则返回一个有效的智能指针shared_ptr，此时加上sharePtrTmp这份引用计数的话，执行完这语句后引用计数应该是大于等于2。否则返回一个空指针。
+
+weakPtr.reset();	// 不再管理之前管理的那份资源.
+
+weakPtr.reset(new MyClass(2));	// 不再管理之前管理的那份资源,而开始管理另一份资源.
+weakPtr.lock();	// 返回空指针.
+
+if(weakPtr.expired()){}	// weaked_ptr所管理的资源是否有效.
+
+5、this转换为智能指针：
+
+void MyClass::func(){
+	std::shared_ptr<MyClass> sharePtr(this); // 错误做法,会造成一个资源有两个智能指针在控制,从而导致析构函数被调用了两次.
+	auto sharePtr = enable_shared_from_this(); // 正确写法.
+}
+std::shared_ptr<MyClass> sharePtr(new MyClass());
+sharePtr.func();
+
+正确做法是继承模板类enable_shared_from_this：
+class MyClass : public std::enable_shared_from_this<MyClass>{
+	...
+}
+但是如果继承了enable_shared_from_this，下面这句话就不推荐了，因为继承了enable_shared_from_this就意味着我们希望MyClass是一种以智能指针的形式来管理的类型：
+MyClass m1;
+
+6、使用智能指针的默认选择是std::unique_ptr，除非要共享。
+
+std::unique_ptr<MyClass> uniPtr(new MyClass(1));
+if(uniPtr){
+	uniPtr->func();
+	(*uniPtr).func();
+}
+
+auto p = uniPtr.get();	// 获得原始指针
+
+uniPtr.release();	// 不再管理所管理的资源.
+delete p;
+
+uniPtr.reset();
+uniPtr.reset(new MyClass(2)); // 先放原有的资源释放,再重新去管理另外一份资源.
+
+std::unique_ptr没有拷贝构造函数，但是有移动构造函数。
+void func(std::unique_ptr<MyClass> uniPtrTmp){
+	...
+}
+func(std::move(uniPtr));	// 移交资源给uniPtrTmp.后面不能再使用uniPtr了.
+
+std::unique_ptr转换为std::shared_ptr：
+std::shared_ptr<MyClass> sharePtr(std::move(uniPtr)); 
+
+7、使用智能指针的注意事项：
+①绝对不要自己手动地管理资源，也即不要自己new和delete；
+②一个裸的指针不要用两个shared_ptr管理；unique_ptr也一样。
+auto pMyClass = new MyClass();
+std::shared_ptr<MyClass> sharePtr1(pMyClass);
+std::shared_ptr<MyClass> sharePtr2(pMyClass);	// 错误写法.
+因为sharePtr1和sharePtr2的引用计数是相互独立的。
+③用weaked_ptr打破循环引用，用裸指针也可以；
+
+④当需要在类的内部接口中，如果需要将this作为智能指针来使用的话，需要用该类派生自enable_shared_from_this。
+
+⑤shared_ptr、weaked_ptr和裸指针相比，在内存占用上会大很多，并且效率上也会有影响，尤其是在多线程模式下。
+std::shared_ptr<MyClass> sharePtr1(new MyClass()); // 会new两次
+std::shared_ptr<MyClass> sharePtr2 = std::make_shared<MyClass>(); // 只会new一次。建议使用这个。
+
+⑥enable_shared_from_this的shared_from_this()在构造析构函数的时候是不能使用的。
+
+⑦某些情况下会出现内存不会降的问题，尤其是我们使用weaked_ptr来处理循环引用的时候。
+
+⑧如果有可能，优先使用类的实例，其次再考虑使用std::unique_ptr，最后才考虑用std::shared_ptr。
+MyClass m1; // 使用类的实例
+
+六、STL基础
+1、一些只需要写一次的函数是非常适合用lambda函数(没有名字的函数)来实现的。
+
+lambda可以作为local对象，也可以作为参数传入。lambda相当于是内联函数，效率高。
+
+auto local = [](int a, int b){
+	std::cout << a << b;
+};
+local(1, 2);
+
+template<typename Func>
+void test(Func f, int a, int b){
+	f(a, b);
+}
+test([](int a, int b){
+	std::cout << a << b;
+	}, 1, 2);
+
+int a = 1;
+int b = 1;
+auto local= [&](){
+	std::cout << a << b;
+};
+local();
+
+2、forward_list不支持size()函数。
+
+3、std::array是直接在栈上分配内存的。
+std::array<int,5> a;		// 里面的值是乱的
+std::array<int,5> b = {};	// 里面的值是0
+std::array<int,5> c = {1};	// 第一个值是1,其余的值是0
+
+a.swap(b);	// 线性的时间复杂度
+swap(a,b);	// 线性的时间复杂度
+
+a[1];	// 不检查下标是否合法
+a.at(1);// 检查下标是否合法,会抛异常.
+
+a.data();// 得到数组的指针.
+
+auto info = std::get<1>a;	// tuple的形式,和a[1]是一样的意思.
+
+a.fill(0);	// 给所有的值赋值为0.
+
+除array之外，其他容器的swap是非常高效的(只交换一些指针值).
+
+4、std::vector里面不要存bool。因为，C++中，vector<bool>为了达到节省内存的目的，专门做了特化，大概方式就是用bit位来存储数组中的元素。代价就是，这个容器里面的内置类型乱掉了。
+std::vector<bool> a;
+a[0];	//类型并不是bool!!!
+
+std::vector<float> a(10);		// 10个元素,值为0.0
+std::vector<float> b(10,1.0f);	// 10个元素,值为1.0f
+
+b.reserve(100);	// 分配100个元素的空间
+
+b.assign(5, 1.0f); // 5个元素,值为1.0f
+b.emplace(b.end(), 1.0f);// C++11
+b.emplace_back(1.0f); // C++11
+
+b.resize(5);	// 重新设置当前大小为5
+b.resize(5, 1.0f);	// 重新设置当前大小为5，如果当前元素个数不足5个，则新增的那些值为1.0f。如果当前元素大于等于5个，那1.0f这个参数就用不上了。
+
+b.clear();	// 容量不会变少，内存还是那么大。要把内存降下来的话，调用shrink_to_fit()函数建议系统去降，请求容器降低其容量和size匹配。
+b.shrink_to_fit(); //c++11
+
+emplace操作与push、insert的区别：
+emplace成员函数利用传入的参数在容器管理的内存中直接构造元素；push与insert成员函数则是将传入的元素类型对象拷贝到容器中，或创建一个局部临时对象，并将其压入容器中。
+注意：emplace函数的参数根据元素类型而变化，参数必须与元素类型的构造函数相匹配。
+std::vector<MyClass> a;
+a.emplace_back(MyClass(1)); // C++11
+
+因此，建议用emplace，而不建议用insert。
+
+在服务器编程中，从客户端收到的包可以用vector来存放。
+先进先出的模型，也就是先收到的包要先发出去，可以用deque来存放。
+
+5、std::list插入和删除不会造成迭代器失效。
+std::list<float> a;
+a.remove(1.0f);	// 删除所有值为1.0f的节点
+a.remove_if([](auto v){ return v>100.0f; }); // v是list里面的元素的值.
+a.reverse();	// 反转链表
+a.sort(); 		// 从小到大排序.
+
+std::list<float> b;
+a.merge(b);	// 合并两个排好序的链表
+
+a.unique();	// 删掉排好序的链表中的重复的元素
+
+a.splice(a.begin(), b);	// 将链表b插入到a.begin的位置.
+
+6、单向链表。
+std::forward_list<float> a;
+a.before_begin();	// 返回第一个元素的前一个位置
+a.cbefore_begin();
+
+a.insert_after(a.before_begin(), 10.0f); // 插入第一个元素.
+a.erase_after(a.before_begin()); // 删除第一个元素.
+
+
+// 在数字3前面插入一个元素
+std::forward_list<int> a{1,2,3,4,5};
+auto iter = a.before_begin();
+for(int i=0; i<2; ++i)	++iter;
+a.insert_after(iter, 10); 
+
+7、容器里面如果存放的是weaked_ptr的时候，遍历的时候效率很慢。
+
+8、对于set可以用count函数来判断一个东西是否存在于容器中，但是对于multiset应该用find函数。
+
+std::set<float> a = {1,2,4,5,6};
+auto lower = a.lower_bound(5); // 返回5的位置
+if(lower != a.end()){
+	if(*lower == 5){
+		// ...
+	}
+}
+auto lower1 = a.lower_bound(3); // 返回4的位置
+auto upper1 = a.upper_bound(3); // 返回4的位置
+
+auto lower2 = a.lower_bound(5); // 返回5的位置
+auto upper2 = a.upper_bound(5); // 返回6的位置
+
+auto er = a.equal_range(5); // 返回一个pair，其中first是lower_bound的结果，second是upper_bound的结果。
+
+auto state = a.insert(100); // 返回一个pair<Iterator,bool>，插入成功与否看该pair的second。
+
+自己实现set的第二个模板参数：
+struct CompareAge{
+	template<typename T>
+	bool operator()(const T& t1, const T& t2) const{
+		return t1.age() < t2.age();
+	}
+};
+std::set<Person, CompareAge> a;
+
+Person p;
+a.find(p);	// 是通过CompareAge去查找的.
+std::find(a.begin(), a.end(), p); // 是通过操作符==去查找的.
+
+// 查找map中的某个元素
+std::map<int> a;
+auto findIter = a.find(10);
+if(findIter != a.end()){
+	...
+}
+
+9、如果对顺序没有需求的话，建议用unordered_map/unordered_set，而不建议用map/set。
+
+要自定义MyClass的hash算法才能用unordered_map/unordered_set：
+
+template<class T> inline void hash_combine(std::size_t &seed, const T &v) {
+	std::hash<T> hasher;
+	seed ^= hasher(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+}
+namespace std {
+	template<> struct hash<Position> {	// 模板的特化
+		size_t operator()(const Position& p) const {
+			auto key = hash<int>()(p.x());
+			hash_combine(key, p.y());
+			return key;
+		}
+	};
+}
+
+std::unordered_set<Position> a;
+
+七、多线程基础
+1、C++11支持多线程：
+高阶接口：async、future
+低阶接口：thread、mutex
+
+#include <iostream>
+#include <thread>
+#include <chrono>	// 里面定义了一些和时间相关的东西
+#include <ctime>
+void func() {
+	cout << "helloword....\n";
+	
+	std::this_thread::sleep_for(std::chrono::milliseconds(100)); // 线程睡眠100ms
+	
+	auto currentThreadId = std::this_thread::get_id(); // 当前线程的id
+}
+int main() {
+
+auto mainThreadId = std::this_thread::get_id(); // 主线程的id
+
+	auto nowc = clock();
+
+	std::thread t(func);	// 如果有传参的话,直接使用lambda
+	
+	auto id = t.get_id();	// 子线程id
+	
+	t.join();	// 等子线程t执行完后,结束子线程t.
+	
+	auto finc = clock();
+	
+	auto used = finc - nowc; // 计算耗时.
+}
+
+sudo g++ -o2 -std=c++11 -o helloworldmultithread helloworldmultithread.cpp -lpthread
+./helloworldmultithread
+
+其中-o2表示编译优化的意思，有-o1、-o2、-o3，但一般用-o2
+
+2、unsigned int n = std::thread::hardware_concurrency(); // 当前机器的默认的并发数.参考值而已.
+
+3、如果没有必要的话，线程间不要共享资源。
+
+4、std::thread的构造函数，第一个参数是函数就行。
+void func(int a, int b, int c) {...}
+
+int a = 1, b = 2, c = 3;
+std::thread t1([=]{ func(a, b, c); } );	// lambda构造法
+t1.join();
+
+std::thread t2(func, a, b, c);	// 值拷贝传参。如果有参数c是要以引用的方式传的，应该传参(func, a, b, std::ref(c));,如果是const引用，则是std::cref(c)。
+t2.join();
+
+建议是使用lambda构造法，即t1的那种方式。
+
+5、一些简单应用中，可以将成员变量声明为原子变量。
+#include <atomic>
+class MyClass
+{
+public:
+	void addCnt() { m_nCount1++; }	// m_nCount1++这个操作是原子操作,不可分割的.
+private:
+	std::atomic<int> m_nCount1; // 支持++、--、+、-、*、/ 等.
+	std::atomic_int m_nCount2;
+}
+
+6、当有两个变量以上要进行协助的时候，原子变量只能保证当前变量操作的原子性，不能保证两个变量之间操作的原子性。此时应该使用mutex。
+
+#include <mutex>
+class MyClass
+{
+public:
+	int func1() { return m_nCount1; }
+	int func2() { return m_nCount2; }
+	void lockMutex() { m_mutex.lock(); };
+	void unlockMutex() { m_mutex.unlock(); };
+private:
+	int m_nCount1;
+	int m_nCount2;
+	std::mutex m_mutex;
+}
+MyClass m;
+m.lockMutex();
+m.func1();
+m.func2();
+m.unlockMutex();
+
+如果lockMutex()，而忘记unlockMutex()，则会锁死。
+如果连续两次lockMutex()，也会锁死。
+
+但是这种手动解锁的方式并不可靠，因为存在抛出异常但又被捕获的时候没有被解锁。应该使用RAII的方式。
+
+#include <mutex>
+class MyClass
+{
+public:
+	void func() { 
+		m_mutex.lock();
+		func1();
+		func2();
+		m_mutex.unlock();
+	}
+	
+private:
+	int func1() { return m_nCount1; }
+	int func2() { return m_nCount2; }
+	
+private:
+	int m_nCount1;
+	int m_nCount2;
+	std::mutex m_mutex;
+}
+MyClass m;
+m.func();
+
+
+加上const之后，m_mutex要修饰为mutable。
+#include <mutex>
+
+template<typename T>
+class Lock{
+public:
+	Lock(T& m) : m_mutex(m) { m_mutex.lock(); }
+	~Lock() { m_mutex.unlock(); }
+private:
+	T& m_mutex;
+};
+class MyClass
+{
+public:
+	int func() const { 
+		m_mutex.lock();
+		auto r = m_nCount;
+		m_mutex.unlock();
+		return r; 
+	}
+	
+	int funcMyRAII() const { 
+		Lock<std::mutex> lock(m_mutex);
+		return m_nCount; 
+	}
+	
+	int funcSTLRAII() const { 
+		std::lock_guard<std::mutex> lock(m_mutex);
+		return m_nCount; 
+	}
+
+private:
+	int m_nCount;
+	mutable std::mutex m_mutex;
+};
+MyClass m;
+m.func();
+m.funcMyRAII();
+m.funcSTLRAII();
+
+当有两个类需要相互协助来原子操作一个事情的时候，有可能会造成死锁。
+struct BankAccount
+{
+	int nBalance;
+	std::mutex Mutex;
+};
+void transferMoney(BankAccount& a, BankAccount& b, int nMoney)
+{
+	std::lock(a.Mutex, b.Mutex); // 任意顺序传参，都是按统一的顺序锁住.但它只负责上锁，不负责解锁.
+	std::lock_guard<std::mutex> lockA(a.Mutex, std::adopt_lock); // adopt_lock意思是这里只解锁就行，前面已经上锁了。
+	std::lock_guard<std::mutex> lockB(b.Mutex, std::adopt_lock);
+	
+	if(a.nBalance <= nMoney)
+		return;
+	a.nBalance -= nMoney;
+	b.nBalance += nMoney;
+}
+
+BankAccount a;
+BankAccount b;
+transferMoney(a, a, 10);
+transferMoney(a, b, 10);
+transferMoney(b, a, 10);
+
+7、std::thread的析构函数是直接终止该程序。
+std::thread有两种"死法"，一种是调用join()，另一种是调用detach().
+
+detach方式的线程里面做的事情的生命周期比整个程序的生命周期要短。
+如果比主程序的生命周期要长，那么主程序已经结束了，这个线程要做的事情还没做完，从而造成这个线程里面一些变量的析构函数不会被调用到。
+
+void func()
+{
+	// ...
+}
+
+std::thread t1(func);
+if(t1.joinable()) {
+	t1.join();	// 如果不调用join()，程序会异常终止。其他变量的析构函数都来不及调用。
+}
+
+std::thread t2(func);
+t2.detach(); // detach()是让系统回收掉线程资源。join()是自己管理线程资源，释放掉资源。
+
+建议使用join()。
+
+如果担心程序中间崩溃了而没有调用join()来释放掉资源，则可以使用RAII的方式。
+class ThreadGuard {
+public:
+	ThreadGuard(std::thread& t) : m_thread(t) {}
+	~ThreadGuard() { 
+		if(m_thread.joinable()) 
+			m_thread.join(); 
+	}
+private:
+	std::thread& m_thread;
+};
+std::thread t(func);
+ThreadGuard guard(t);
+
+8、尽量少用全局变量，因为全局变量的构造和析构函数可能是不受程序控制的。
+
+9、多线程调用std::cout和std::endl输出的东西可能是乱的。
+std::cout << i << std::endl; // 不一定是一个i一个换行地输出
+
+printf("%d\n", i);	// 一个i一个换行地输出。printf是线程安全的。
+
+创建线程的顺序可能和执行线程操作的顺序是不一样的。
+
+10、#include <condition_variable>
+std::condition_variable cv;
+std::atomic<bool> ready{false};
+void func()
+{
+	while(!ready)	// 死等
+	{
+		std::this_thread::yield();  // 方法一：暂时让出cpu。这应该和sleep(0)差不多，只是让出当前时间片，然后继续竞争cpu。cpu占用仍然很高.
+		std::this_thread::sleep_for(std::chrono::seconds(1)); // 方法二。cpu占用低。
+	}
+	
+	// do something...
+}
+
+std::thread t(func);
+ready = true;
+
+
+// 方法三：使用condition_variable
+void func()
+{
+	std::unique_lock<std::mutex> lock(mutex);
+	cv.wait(lock, []{ return ready; }); // 这个时候是不加锁的(unique_lock的作用)。把锁释放掉，然后等待后面lambda函数的条件成立(有时候我们不notify，系统也会莫名地检查后面的条件，因此我们不要直接cv.wait(lock);)。当后面条件成立的时候，再去锁住然后往下面跑。
+}
+std::thread t(func);
+ready = true;
+cv.notify_one(); // 通知一个线程(假设有多个线程在等待该消息)
+
+// cv.notify_all(); 通知所有线程(唤醒所有线程)
+
+八、实战
+1、关于文件读写和静态变量析构的问题：
+#include <QCoreApplication>
+#include <QDebug>
+#include <QFile>
+
+class Log
+{
+public:
+    Log(int id, const QString& filename)
+    {
+        m_id = id;
+        f.setFileName(filename);
+        f.open(QIODevice::WriteOnly|QIODevice::Append);
+
+        qDebug() << m_id << " create";
+    }
+
+    ~Log()
+    {
+        f.close();
+        qDebug() << m_id << " delete";
+    }
+
+    void log(const QString& info)
+    {
+        qDebug() << m_id << "write log: " <<info;   // 会打印hello和world.
+        f.write(info.toLocal8Bit());
+        f.flush();  // 如果不主动调用flush(最后析构的时候会被动调用)，最后log.log的内容只有hello。如果用fstream的方式且调用flush，是只有world。
+    }
+
+private:
+    int m_id;
+    QFile f;
+};
+
+void test1()
+{
+    static Log log(1, "./log.log");     // Log应该用单例模式，这样调用是不合理的.
+    log.log("hello");
+}
+
+void test2()
+{
+    static Log log(2, "./log.log");
+    log.log("world");
+}
+
+int main(int argc, char *argv[])
+{
+    QCoreApplication a(argc, argv);
+
+    {
+        test1();
+        test2();
+    }
+
+    return a.exec();
+}
+
+2、int型转string：std::to_string(i);
+
+3、要尽量缩小锁的范围。
+
+4、如果一个类有虚函数，它的大小至少就是1个虚指针的大小。
+
+如果一个类是基类，那么它的析构函数要主动修饰为virtual，否则在多态的使用中不会调用子类的析构函数。
+
+// 删除所有特定值
+template<typename T>
+void removeAllSameValue(std::vector<T>& group, T value) {
+	// remove是把区间内的value元素放在group的后面，然后返回该位置，然后再调用erase删掉该位置(区间)的元素。
+	group.erase(std::remove(group.begin(), group.end(), value), group.end());
+}
+
+迭代器不要用小于号<进行比较，应该用不等于号!=进行比较。
+
+5、boost里面的网络库asio是用于网络和底层io编程的跨平台C++库，异步模型。支持同步模式和异步模式。
+
+6、基于事件驱动的编程模型。
+Reactor模型：lighttpd、libevent、libev、poco
+Proactor模式：asio、iocp
+
+7、Ubuntu安装boost和编译使用boost的cpp：
+sudo apt-get install libboost-all-dev
+g++ -std=c++11 -o test01 test01.cpp -lboost_system
+
+8、c++14才支持lambda形参中使用auto。
+
+9、lambda实际上是编译器给我们生成了一个类，里面重载了()运算符。
+[]里面的东西其实相当于类的成员，()里面的东西其实相当于()运算符的形参。
+
+auto lambda1 = [](){};
+auto lambda2 = [](int a){ std::cout << a << std::endl; };
+int b = 1;
+auto lambda3 = [b](int a){ std::cout << a << b << std::endl; };
+
+int c = 1;
+auto lambda4 = [b, &c](int a){ std::cout << a << b << c << std::endl; };
+sizeof(lambda1);	// 大小是1
+sizeof(lambda2);	// 大小是1
+sizeof(lambda3);	// 大小是4，因为b是成员变量
+sizeof(lambda4);	// 大小是16，因为b是成员变量(占4字节)、c是引用(相当于指针，64位平台是8字节)。字节对齐之后，就变16字节了。
+
+10、boost绑定回调函数，使用bind的方式：
+timer1.async_wait(boost::bind(&MyClass::func, this));
+
+11、多线程环境下通过使用boost::asio::io_service::strand的wrap函数包裹lambda表达式来同步回调函数。
+io_service相当于是程序和操作系统之间桥梁。
+
+12、#include <time.h>和#include <ctime>的区别在于ctime里面的东西是包含在std命名空间里面的。
+
+13、传this的智能指针给lambda的方式。
+auto self = shared_from_this();
+func([self = std::move(self)]() { self->funcImp(); } );
+
+14、方式二会更高效，但是当MyClass的构造函数private的时候，无法使用这个方式，因为make_shared里面会调用MyClass的构造函数。
+方式一：std::shared_ptr<MyClass>(new MyClass(aaa));
+方式二：std::make_shared<MyClass>(aaa);
+
+15、继承enable_shared_from_this的类，在构造函数和析构函数中不能调用shared_from_this函数。
+
+16、<<和write的区别在于<<有很多格式化的操作。
+char reply[1024];
+std::cout << reply; 
+std::cout.write(reply, 1024);
+
+17、类的外部如果要使用类内部的常量的时候，应该使用枚举，不应该使用static常量。
+一些阿拉伯数字有时候最好也是用枚举来表示，不要直接使用阿拉伯数字。
+
+18、如果io_service运行在独立的线程中，可以通过io_service的post函数将主线程要做的一些事情注册到io_service中，然后这些事情将会在某个时刻运行在io_service所在的线程中。
+
+19、getline函数在linux下按ctrl+d结束输入。
+ctrl+c是终止程序。
+
+20、在头文件定义一个函数时(这个头文件没有class)，要把这个函数修饰为inline。否则当有两个cpp包含这个头文件的时候，会生成两份函数实体，链接的时候就会报错。
+
+21、消息协议Protocal Buffer的用法。
+
+编写自己的Protocal.proto，内容如下：
+syntax = 'proto3';
+message MyName
+{
+	string name = 1;	// 1表示占位符,第一位.
+}
+message MyInfo
+{
+	string name = 1;	// 第一部分是name
+	string info = 2;	// 第二部分是info
+}
+
+然后用工具protoc将这个Protocal.proto生成对应语言的文件(相当于代码)：
+protoc --version
+protoc --help
+protoc --cpp_out=. Protocal.proto
+然后会在当前目录.下面生成Protocal.pb.h和Protocal.pb.cc
+
+然后我们的代码包含Protocal.pb.h即可使用。
+
+在main函数的开始，加上下面这句话，避免版本不兼容：
+GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+在main函数的最后，加上下面这句话，避免有工具误判程序内存泄漏：
+google::protobuf::ShutdownProtobufLibrary();
+
+编译时，要链接相关静态库：-lprotobuf
+
+std::string newName = "xxxx";
+MyName myName;
+myName.set_name(newName);
+std::string sendBuffer;
+auto ok = myName.SerializeToString(&outBuffer);
+
+std::string recvBuffer = "xxxx";
+MyInfo myInfo;
+auto ok = myInfo.ParseFromString(recvBuffer);
+auto nameTmp = myInfo.name();
+auto infoTmp = myInfo.info();
+
+Json解析比Protocal Buffer解析慢一点。
+
+22、rand()函数产生的随机数每次启动都是一样的。
+for(int i=0; i<10; ++i)
+{
+	qDebug() << rand()%10+1;	// 本机每次运行的结果都是 2 8 5 1 10 5 0 0 3 5
+}
+
+23、安装Linux下的debug调试工具gdb，就相当于程序运行在gdb这个壳里面：
+sudo apt-get install gdb
+gdb --version
+gdb ./mytcpserver 
+r 9999					// r是run的意思，9999是mytcpserver的端口号
+info thread				// 查看出错的线程
+bt						// 把调用的堆栈打印出来
+q						// 退出
+
+g++编译的时候，编译选项加上 -g 把一些debug调试信息在bt打印出来，当用gdb调试的时候更容易定位到错误。
+
+24、stl容器的使用是线程不安全的。
+
+25、多线程环境下通过使用boost::asio::io_service::strand的post函数包裹lambda表达式来异步保护成员变量。用mutex是同步保护成员变量的。
+
+26、使用boost的log库。
+g++编译的时候要加上 -DBOOST_LOG_DYN_LINK 和 -lboost_log 和 -lboost_log_setup 和 -lboost_thread
+
+#include <boost/log/core.hpp>
+#include <boost/log/trivial.hpp>
+#include <boost/log/expressions.hpp>
+#include <boost/log/utility/setup/file.hpp>
+
+int main()
+{
+	boost::log::add_file_log("sample.log");	// 设置日志名字
+	boost::log::core::get()->set_filter(
+		boost::log::trivial::severity >= boost::log::trivial::info);	// 设置日志等级
+
+	BOOST_LOG_TRIVIAL(trace) << "trace log";
+	BOOST_LOG_TRIVIAL(debug) << "debug log";
+	BOOST_LOG_TRIVIAL(info) << "info log";
+	BOOST_LOG_TRIVIAL(warning) << "warning log";
+	BOOST_LOG_TRIVIAL(error) << "error log";
+	BOOST_LOG_TRIVIAL(fatal) << "fatal log";
+}
+
+27、async的用法：
+g++编译选项要加 -pthread
+#include <future>
+#include <numeric>
+// async(func, param...);
+// async(flag, func, param...)
+
+28、ctrl+c相当于给程序发一个中断信号INT
+相当于 kill -s INT 1589
+1589是PID.
+
+在程序中可以捕获并处理这个信号
+#include <signal.h>
+
+static std::function<void()> safeQuit;
+
+void signalHander(int sig)
+{
+	BOOST_LOG_TRIVIAL(info) << "handle signal " << sig;
+	if(safeQuit)
+	{
+		safeQuit();
+		safeQuit = nullptr;	// 避免连续的ctrl+c,程序退出多次
+	}
+}
+
+int main()
+{
+	boost::asio::io_service io_service;
+	safeQuit = [&io_service]{ io_service.stop(); };
+	
+	signal(SIGINT, signalHander);
+}
+
+29、cmake的使用。
+主要是维护和编写CMakeLists.txt
+cmake会生成一些临时文件，最好放在build目录下。
+mkdir build
+cd build
+cmake ..
+然后会生成Makefile，接着直接make即可。
