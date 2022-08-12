@@ -295,7 +295,7 @@
     -n | --numeric-sort             | 将字符串按数值意义排序
     -o | --output=file              | 将排序结果写入指定文件
     -R | --random-sort              | 根据随机哈希排序
-       | --random-source=FILE       | 指定-R 选项用到的随机字节文件
+    -R | --random-source=FILE       | 指定-R 选项用到的随机字节文件
     -r | --reverse                  | 逆序排序（升序变成降序）
     -S | --buffer-size=SIZE         | 指定使用的内存大小
     -s | --stable                   | 禁止 last-resort 比较，实现稳定排序
@@ -374,7 +374,7 @@
     -A | --concatenate  | 将一个 tar 归档文件追加到另一个 tar 归档文件末尾
     -c | --create       | 创建新的 tar 归档文件
     -d | --diff         | 检查归档文件和文件系统的不同之处
-       | --delete       | 从 tar 归档文件中删除文件
+    |  | --delete       | 从 tar 归档文件中删除文件
     -r | --append       | 将文件追加到 tar 归档文件末尾
     -t | --list         | 列出 tar 归档文件的内容
     -u | --update       | 将比 tar 归档文件中已有的同名文件更新的文件追加到该归档文件 
