@@ -547,7 +547,7 @@
     - $HOME/.profile
     - 因此，应该将需要在登录时运行的脚本放在上述第一个文件中。
 - 每次启动新 shell，bash shell 都会运行.bashrc 文件。
-- 一般而言，用户登录时会运行从$HOME/.bash_profile 、$HOME/.bash_login 或$HOME/.profile 中找到的第一个文件，而$HOME/.bashrc 则是由非登录 shell（nonlogin shell）运行的文件。
+- 一般而言，用户登录时会运行从$ HOME/.bash_profile 、$ HOME/.bash_login 或$ HOME/.profile 中找到的第一个文件，而$HOME/.bashrc 则是由非登录 shell（nonlogin shell）运行的文件。
 - .bashrc 文件通常也借由某个 bash 启动文件来运行，因为.bashrc 文件会运行两次：一次是当用户登录 bash shell 时，另一次是当用户启动 bash shell 时。如果需要某个脚本在两个时刻都运行，可以将其放入该文件中。
 
 21. 实战演练
@@ -557,3 +557,4 @@
     ```
     - 注意，以上脚本的运行方式并没有使用 bash 或./运行文件， 而是改用了 source 工具。这是另一种运行 bash 脚本的方法，称为源引（sourcing）。这种操作与使用 bash 运行脚本差不多，只是不会创建子 shell。
     - 当使用 source 命令运行脚本时，就像bash 一样，无须在文件中设置执行权限。
+
