@@ -50,6 +50,8 @@ catch(exception& e)
 
 8、list容器有max_size()函数，它不是根据内存大小决定的吗？？
 
+-  max_size()函数返回根据系统或库实现限制的容器可保有的元素最大数量，即对于最大容器的 std::distance(begin(), end()) 。此值通常反映容器大小上的理论极限，至多为 std::numeric_limits<difference_type>::max() 。运行时，可用 RAM 总量可能会限制容器大小到小于 max_size() 的值。
+
 9、当容器(例如list)自己有sort函数的时候，应该用自带的，而不是用STL的(全局的))。
 ```
 lst.sort();
@@ -58,7 +60,7 @@ lst.sort();
 
 10、forward_list和slist是一样的用途。
 
-`slist是在头文件#include <ext/slist>中，用法是__gnu_cxx::slist<std::string> c;.`
+`slist是在头文件#include <ext/slist>中，用法是__gnu_cxx::slist<std::string> c;`
 
 11、stack(先进后出)和queue(先进先出)基于deque实现，但没有提供iterator操作。
 
@@ -312,8 +314,10 @@ input_access_iterator_tag、         // 输入
 ```
 
 52、memmove函数：
+
 ```
 /* memmove example */
+// C 库函数 void *memmove(void *str1, const void *str2, size_t n) 从 str2 复制 n 个字符到 str1，但是在重叠内存块这方面，memmove() 是比 memcpy() 更安全的方法。如果目标区域和源区域有重叠的话，memmove() 能够保证源串在被覆盖之前将重叠区域的字节拷贝到目标区域中，复制后源区域的内容会被更改。如果目标区域与源区域没有重叠，则和 memcpy() 函数功能相同。
 #include <stdio.h>
 #include <string.h>
 int main ()
