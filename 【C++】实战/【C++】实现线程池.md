@@ -12,7 +12,7 @@ AStealTaskQueue：基于 std::mutex 的线程安全的 deque，用于存放各�
 
 AMyThreadPool：对外使用的主类，外面通过 submit() 函数提交任务给线程池并得到对应任务的 future。
 
-```
+```C++
 #ifndef AMYTHREADPOOL_H
 #define AMYTHREADPOOL_H
 
@@ -341,7 +341,7 @@ thread_local unsigned AMyThreadPool::tl_nCurThreadIndex;
 ```
 
 2、测试代码
-```
+```C++
 #include "threadpool/amythreadpool.h"
 #include <iostream>
 #include <thread>

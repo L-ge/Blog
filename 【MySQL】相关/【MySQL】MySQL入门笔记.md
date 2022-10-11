@@ -43,6 +43,7 @@ source xxx.sql
 
 # 二、MySQL工具
 1、mysql命令行实用程序
+
 - 命令用;或\g结束，换句话说，仅按Enter不执行命令；
 - 输入help或\h获得帮助，也可以输入更多的文本获得特定命令的帮助；（例如，输入help select获得使用SELECT语句的帮助）；
 - 输入quit或exit退出命令行实用程序。
@@ -56,6 +57,7 @@ mysql> source xxx.sql              // 执行当前目录下xxx.sql脚本
 ```
 
 2、show命令
+
 ```
 mysql> show databases;              // 返回可用数据库的一个列表
 mysql> show tables;                 // 获得当前选择的数据库内可用表的列表
@@ -72,6 +74,7 @@ mysql> help show;                   // 显示show命令的帮助信息
 
 # 四、检索数据
 1、select语句
+
 ```
 mysql> select prod_name from products;                      // 从products表中检索出一个名为prod_name的列(返回的结果是可能并不是插入表的顺序)
 mysql> select prod_id, prod_name, prod_price from products; // 从products表中检索出一个名为prod_id, prod_name, prod_price的列，列名之间用逗号分隔
@@ -92,6 +95,7 @@ mysql> select products.prod_name from products;             // 从products表中
 
 为了明确地排序用select语句检索出的数据，可使用 order by 子句。
 order by 子句取一个或多个列的名字，据此对输出进行排序。
+
 ```
 mysql> select prod_name from products order by prod_name;  // 指示MySQL对prod_name列以字母顺序排序数据。
 mysql> select prod_id, prod_price, prod_name from products order by prod_price, prod_name;   // 按其中两个列对结果进行排序。仅在多个行具有相同的prod_price值时才对产品按prod_name进行排序。如果prod_price列中所有的值都是唯一的，则不会按prod_name排序。
@@ -111,6 +115,7 @@ mysql> select prod_price from products order by prod_price desc limit 1;    // �
 # 六、过滤数据
 
 1、where
+
 ```
 mysql> select prod_name, prod_price from products where prod_price=2.50;    // 只返回prod_price值为2.50的行
 
@@ -143,13 +148,14 @@ mysql> select cust_id from customers where cust_email is null;
 != | 不等于
 < | 小于
 <= | 小于等于
-> | 大于
+\> | 大于
 >= | 大于等于
 BETWEEN | 在指定的两个值之间
 
 # 七、数据过滤
 
 1、组合where子句
+
 ```
 mysql> select prod_id, prod_price, prod_name from products where vend_id=1003 and prod_price<=10;
     
@@ -163,6 +169,7 @@ mysql> select prod_name, prod_price from products where vend_id=1002 or vend_id=
 - 任何时候使用具有and和or操作符的where子句，都应该使用圆括号明确地分组操作符，不要过分依赖默认计算次序。
 
 2、in操作符
+
 ```
 mysql> select prod_name, prod_price from products
     -> where vend_id in (1002,1003) order by prod_name;
@@ -196,6 +203,7 @@ mysql> select prod_name, prod_price from products
 # 八、用通配符进行过滤
 
 1、like操作符
+
 ```
 mysql> select prod_id, prod_name from products where prod_name like 'jet%'; // 检索任意以jet起头的词。%告诉MySQL接受jet之后的任何字符，不管它有多少字符。
 
@@ -298,8 +306,8 @@ mysql> select prod_name from products where prod_name regexp '1000' order by pro
 
 元字符 | 说明
 ---|---
-* | 0个或多个匹配
-+ | 1个或多个匹配（等于{1,}）
+\* | 0个或多个匹配
+\+ | 1个或多个匹配（等于{1,}）
 ? | 0个或1个匹配（等于{0,1}）
 {n} | 指定数目的匹配
 {n,} | 不少于指定数目的匹配
@@ -346,20 +354,22 @@ mysql> select concat(rtrim(vend_name), ' (', rtrim(vend_country), ')') from vend
 
 3、别名是一个字段或值的替换名。别名用AS关键字赋予。方便客户机按名引用这个列。
 别名有时也称为导出列。
+
 ```
 mysql> select concat(rtrim(vend_name), ' (', rtrim(vend_country), ')') as vend_title from vendors order by vend_name;
 ```
 
 4、计算字段的另一常见用途是对检索出的数据进行算术计算。
+
 ```
 mysql> select prod_id, quantity, item_price, quantity*item_price as expanded_price from orderitems where order_num=20005;
 ```
 MySQL算术操作符
 操作符 | 说明
 ---|---
-+ | 加
-- | 减
-* | 乘
+\+ | 加
+\- | 减
+\* | 乘
 / | 除
 
 5、select提供了测试和试验函数与计算的一个很好的方法。
@@ -373,18 +383,19 @@ MySQL算术操作符
 1、函数没有SQL的可移植性强。几乎每种主要的DBMS的实现都支持其他实现不支持的函数，而且有时候差异还很大。
 
 2、大多数SQL实现支持以下类型的函数。
+
 - 用于处理文本串（如删除或填充值，转换值为大写或小写）的文本函数。
 - 用于在数值数据上进行算术操作（如返回绝对值，进行代数计算）的数值函数。
 - 用于处理日期和时间值并从这些值中提取特定成分（例如，返回两个日期之差，检查日期有效性等）的日期和时间函数。
 - 返回DBMS正使用的特殊信息（如返回用户登录信息，检查版本细节）的系统函数。
 
 3、文本处理函数
+
 ```
 mysql> select vend_name, upper(vend_name) as vend_name_upcase from vendors order by vend_name;
 ```
 
 - Upper()将文本转换为大写。
-
 
 4、常用的文本处理函数
 
@@ -404,6 +415,7 @@ Upper() | 将串转换为大写
 注：SOUNDEX是一个将任何文本串转换为描述其语音表示的字母数字模式的算法。
 SOUNDEX考虑了类似的发音字符和音节，使得能对串进行发音比较而不是字母比较。
 虽然SOUNDEX不是SQL概念，但MySQL(就像多数DBMS一样)都提供对SOUNDEX的支持。
+
 ```
 mysql> select cust_name, cust_contact from customers where cust_contact='Y.lie';
 mysql> select cust_name, cust_contact from customers where soundex(cust_contact)=soundex('Y.lie'); // 匹配所有发音类似于Y.Lie的联系名
@@ -558,7 +570,6 @@ mysql> select vend_id, count(*) as num_prods from products where prod_price>=10 
 - 过滤是基于分组聚集值而不是特定行值的。
 - having和where的差别：where在数据分组前进行过滤，having在数据分组后进行过滤。这是一个重要的区别，where排除的行不包括在分组中。这可能会改变计算值，从而影响having子句中基于这些值过滤掉的分组。
 
-
 4、分组和排序
 
 order by与group by的区别：
@@ -593,6 +604,7 @@ limit | 要检索的行数 | 否
 # 十四、使用子查询
 
 1、利用子查询进行过滤
+
 ```
 mysql> select order_num from orderitems where prod_id='TNT2';
 mysql> select cust_id from orders where order_num in (20005, 20007);
@@ -604,7 +616,6 @@ mysql> select cust_id from orders where order_num in (select order_num from orde
 - 对于能嵌套的子查询的数目没有限制，不过在实际使用时由于性能的限制，不能嵌套太多的子查询。
 - 在where子句中使用子查询，应该保证select语句具有与where子句中相同数目的列。通常，子查询将返回单个列并且与单个列匹配，但如果需要也可以使用多个列。
 - 虽然子查询一般与IN操作符结合使用，但也可以用于测试等于(=)、不等于(<>)等。
-
 
 2、作为计算字段使用子查询
 
@@ -662,6 +673,7 @@ mysql> select prod_name, vend_name, prod_price, quantity
 # 十六、创建高级联结
 
 1、SQL允许给表名起别名。这样做有两个主要理由：一是缩短SQL语句；二是允许在单条select语句中多次使用相同的表。
+
 ```
 mysql> select cust_name, cust_contact 
        from customers as c, orders as o, orderitems as oi
@@ -714,6 +726,7 @@ mysql> select customers.cust_id, orders.order_num
 - 存在两种基本的外部联结形式：左外部联结和右外部联结。它们之间的唯一差别是所关联的表的顺序不同。换句话说，左外部联结可通过颠倒from或where子句中表的顺序转换为右外部联结。因此，两种类型的外部联结可互换使用。
 
 3、使用带聚集函数的联结
+
 ```
 mysql> select customers.cust_name, customers.cust_id, count(orders.order_num) as num_ord
        from customers inner join orders on customers.cust_id = orders.cust_id
@@ -743,6 +756,7 @@ mysql> select customers.cust_name, customers.cust_id, count(orders.order_num) as
 多数情况下，组合相同表的两个查询完成的工作与具有多个where子句条件的单条查询完成的工作相同。换句话说，任何具有多个where子句的select语句都可以作为一个组合查询给出。
 
 2、可用union操作符来组合数条SQL查询。
+
 ```
 mysql> select vend_id, prod_id, prod_price
        from products
@@ -866,13 +880,13 @@ mysql> select note_text from productnotes where match(note_text) against('heavy 
 
 布尔操作符 | 说明
 ---|---
-+ | 包含，词必须存在
-- | 排除，词必须不出现
-> | 包含，而且增加等级值
+\+ | 包含，词必须存在
+\- | 排除，词必须不出现
+\> | 包含，而且增加等级值
 < | 包含，而且减少等级值
 () | 把词组成子表达式(允许这些子表达式作为一个组被包含、排序、排列等)
 ~ | 取消一个词的排序值
-* | 词尾的通配符
+\* | 词尾的通配符
 "" | 定义一个短语(与单个词的列表不一样，它匹配整个短语以便包含或排除这个短语)
 
 ```
@@ -1021,8 +1035,8 @@ mysql> update customers set cust_email = NULL where cust_id = 10005;    // 其�
 - 如果用update语句更新多行，并且在更新这些行中的一行或多行时出现一个错误，则整个update操作被取消(错误发生前更新的所有行将恢复到它们原来的值)。为即使是发生错误，也继续进行更新，可使用ignore关键字，如下所示：update ignore customers xxxxx.
 - 为了删除某个列的值，可设置它为NULL(假如表定义允许NULL值)。
 
-
 2、为了从一个表中删除(去掉)数据，使用delete语句。可以两种方式使用delete：从表中删除特定的行、从表中删除所有行。
+
 - 不要省略where子句：在使用delete时一定要注意细心，因为稍不注意，就会错误地删除表中所有行。
 - delete与安全；可以限制和控制delete语句的使用。
 
@@ -1034,6 +1048,7 @@ mysql> delete from customers where cust_id = 10006; // delete from要求指定�
 - 如果想从表中删除所有行，不要使用delete。可使用truncate table语句，它完成相同的工作，但速度更快(truncate实际是删除原来的表并重新创建了一个表，而不是逐行删除表中的数据)。
 
 3、更新和删除的指导原则
+
 - 除非确实打算更新和删除每一行，否则绝对不要使用不带where子句的update或delete语句。
 - 保证每个表都有主键，尽可能像where子句那样使用它(可以指定各主键、多个值或值的范围)。
 - 在对update或delete语句使用where子句前，应该先用select进行测试，保证它过滤的是正确的记录，以防编写的where子句不正确。
@@ -1044,6 +1059,7 @@ mysql> delete from customers where cust_id = 10006; // delete from要求指定�
 # 二十一、创建和操纵表
 
 1、一般有两种创建表的方法：
+
 - 使用具有交互式创建和管理表的工具；
 - 表也可以直接用MySQL语句操纵。
 
@@ -1091,6 +1107,7 @@ mysql> create TABLE orderitems20220227
 - 与大多数DBMS不一样，MySQL不允许使用函数作为默认值，它只支持常量。
 
 2、几个需要知道的引擎
+
 - InnoDB是一个可靠的事务处理引擎，它不支持全文本搜索；
 - MEMORY在功能等同于MyISAM，但由于数据存储在内存(不是磁盘)中，速度很快(特别适合于临时表)；
 - MyISAM是一个性能极高的引擎，它支持全文本搜索，但不支持事务处理。
@@ -1123,6 +1140,7 @@ mysql> ALTER TABLE orderitems ADD CONSTRAINT fk_orderitems_orders FOREIGN KEY (o
 注意：使用alter table要极为小心，应该在进行改动前做一个完整的备份(模式和数据的备份)。数据库表的更改不能撤销，如果增加了不需要的列，可能不能删除它们。类似地，如果删除了不应该删除的列，可能会丢失该列中的所有数据。
 
 4、删除表(删除整个表而不是其内容)使用drop table语句。
+
 ```
 mysql> drop table orders20220227;
 ```
@@ -1192,7 +1210,6 @@ mysql> select cust_name, cust_contact
 - 可以看出，视图极大地简化了复杂SQL语句的使用。利用视图，可一次性编写基础的SQL，然后根据需要多次使用。
 - 创建不受特定数据限制的视图是一种好办法。扩展视图的范围不仅使得它能被重用，而且甚至更有用。这样做不需要创建和维护多个类似视图。
 
-
 4、视图的另一常见用途是重新格式化检索出的数据。
 
 ```
@@ -1256,6 +1273,7 @@ mysql> select * from orderitemsexpanded where order_num=20005;
 
 换句话说，使用存储过程有3个主要的好处，即简单、安全、高性能。
 不过，在将SQL代码转换为存储过程前，也必须知道它的一些缺陷：
+
 - 一般来说，存储过程的编写比基本SQL语句复杂，编写存储过程需要更高的技能，更丰富的经验。
 - 你可能没有创建存储过程的安全访问权限。
 尽管有这些缺陷，存储过程还是非常有用的，并且应该尽可能地使用。
@@ -1265,6 +1283,7 @@ mysql> select * from orderitemsexpanded where order_num=20005;
 
 MySQL称存储过程的执行为调用，因此MySQL执行存储过程的语句为CALL。
 CALL接受存储过程的名字以及需要传递给它的任意参数。
+
 ```
 mysql> call productpricing(@pricelow, @pricehigh, @priceaverage);   // 执行名为productpricing的存储过程，它计算并返回产品的最低、最高和平均价格。
 
@@ -1822,7 +1841,7 @@ super | 使用change master、kill、logs、purge、master和set global。还允
 update | 使用update
 usage | 无访问权限
 
- 
+
 - 在使用grant和revoke时，用户账号必须存在，但对所涉及的对象没有这个要求。这允许管理员在创建数据库和表之前设计和实现安全措施。这样做的副作用是，当某个数据库或表被删除时(用drop语句)，相关的访问权限仍然存在。而且，如果将来重新创建数据库或表，这些权限仍然起作用。
 - 可通过列出各权限并用逗号分隔，将多条grant语句串在一起，如：grant select, insert on crashcourse.* to bforta; 
 

@@ -1,5 +1,5 @@
 1、智能指针类，包括 AMyUniquePtr、AMySharedPtr、AMyWeakPtr。
-```
+```C++
 #ifndef AMYSMARTPOINTER_H
 #define AMYSMARTPOINTER_H
 
@@ -348,7 +348,7 @@ private:
 ```
 
 2、测试程序
-```
+```C++
 #include <iostream>
 #include "smartpointer/amysmartpointer.h"
 struct A
@@ -420,7 +420,7 @@ int main(int argc, char *argv[])
 ```
 
 3、测试结果
-```
+```C++
 A()
 ~A()
 
