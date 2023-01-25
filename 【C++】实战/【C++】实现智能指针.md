@@ -334,6 +334,7 @@ private:
             m_pCnter->minusWeakCnt();
             if(m_pCnter->getSharedCnt()<1 && m_pCnter->getWeakCnt()<1)
             {
+                delete m_pCnter;
                 m_pCnter = nullptr;
             }
         }
