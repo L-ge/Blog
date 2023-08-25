@@ -19,6 +19,9 @@
 - QThreadData 是 Qt 自己封装的一个线程结构类，里面有如 threadId 等成员。
 - 另外，其实 Qt 的线程是在操作系统线程上面的再一次封装，追踪 threadId 的赋值来源可以知道。
 
+5. moveToThread 是线程安全的吗？
+- 应该不是，比如对 moveToThread_helper() 函数里面的 children 的操作没有加锁。
+
 ---
 
 ##### 二、source code：
