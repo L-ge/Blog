@@ -1,7 +1,8 @@
 ##### 一、QA：
 
 1. QSharedPointer 是线程安全的吗？
-- 不是。例如， QSharedPointer 拷贝构造函数中 ref() 函数的实现。
+- 官方注释说，QSharedPointer 和 QWeakPointer 都是线程安全的。
+- 但感觉不是？！例如， QSharedPointer 拷贝构造函数中 ref() 函数的实现。
     ```cpp
     void ref() const noexcept { d->weakref.ref(); d->strongref.ref(); }
     ```
@@ -28,6 +29,9 @@
         return d == nullptr || d->strongref.loadRelaxed() == 0 ? nullptr : value;
     }
     ```
+
+5. 关于 std::shared_ptr线程安全的探究。
+- 所有成员函数（包括拷贝构造函数和拷贝分配）都可以在不同的shared_ptr实例上被多个线程调用，而不需要额外的同步，即使这些实例是副本并共享同一对象的所有权。如果多个执行线程在没有同步的情况下访问相同的shared_ptr实例，并且其中任何一个访问使用了shared_ptr的非常量成员函数，那么将会发生数据竞争；原子函数的shared_ptr过载可以用来防止数据竞争。
 
 ---
 
