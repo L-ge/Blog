@@ -1,6 +1,6 @@
 ##### 一、QA：
 
-1. 1. QVector 内部的数据结构是 QTypedArrayData<T>，而 QTypedArrayData 继承自 QArrayData。QArrayData 有个 QtPrivate::RefCount 类型的成员变量 ref，该成员变量记录着该内存块的引用。也就是说，QVector 采用了 Copy On Write 的技术优化了存放数据的内存块。
+1. QVector 内部的数据结构是 QTypedArrayData<T>，而 QTypedArrayData 继承自 QArrayData。QArrayData 有个 QtPrivate::RefCount 类型的成员变量 ref，该成员变量记录着该内存块的引用。也就是说，QVector 采用了 Copy On Write 的技术优化了存放数据的内存块。
 
 2. 可以从 QVector<T>::QVector(const QVector<T> &v)、QVector<T>::append(const T &t) 的实现看出的确是采用了 COW 技术。
 
