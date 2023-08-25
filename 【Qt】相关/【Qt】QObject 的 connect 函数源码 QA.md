@@ -51,6 +51,12 @@
 - Connection 里面的 connectionType 如果是 Qt::QueuedConnection 或者是 Qt::AutoConnection 且不在同一个线程，那么会当前信号调用封装成 QMetaCallEvent 对象，并 postEvent 到接受者的事件队列去。
 - 不在同一个线程是通过 Connection 的 receiverThreadData 的 threadId （信号接收者） 和 QThread::currentThreadId()（发送信号者）对比得知。
 
+5. for 循环一直 connect 会内存泄漏吗？connect 的数据是怎么存的？connect 一万次就发送一万次信号？
+- 会内存泄漏，因为它内部缓存的数据接口是链表。
+- connect 一万次就发送一万次信号。
+
+6. 由于 connect 内部缓存的数据接口是链表，因此，同一个信号多个槽函数时，槽函数响应的顺序就是绑定的顺序（单线程情况下。如果在多线程情况下，执行的顺序是不确定的，因为主要依赖事件循环，并不一定能够确定多线程的顺序）。
+
 ---
 
 ##### 二、source code：
@@ -211,9 +217,48 @@ QMetaObject::Connection QObjectPrivate::connectImpl(const QObject *sender, int s
 
     return ret;
 }
+
+/*!
+  \internal
+  Add the connection \a c to the list of connections of the sender's object
+  for the specified \a signal
+
+  The signalSlotLock() of the sender and receiver must be locked while calling
+  this function
+
+  Will also add the connection in the sender's list of the receiver.
+ */
+void QObjectPrivate::addConnection(int signal, Connection *c)
+{
+    Q_ASSERT(c->sender == q_ptr);
+    ensureConnectionData();
+    ConnectionData *cd = connections.loadRelaxed();
+    cd->resizeSignalVector(signal + 1);
+
+    ConnectionList &connectionList = cd->connectionsForSignal(signal);
+    if (connectionList.last.loadRelaxed()) {
+        Q_ASSERT(connectionList.last.loadRelaxed()->receiver.loadRelaxed());
+        connectionList.last.loadRelaxed()->nextConnectionList.storeRelaxed(c);
+    } else {
+        connectionList.first.storeRelaxed(c);
+    }
+    c->id = ++cd->currentConnectionId;
+    c->prevConnectionList = connectionList.last.loadRelaxed();
+    connectionList.last.storeRelaxed(c);
+
+    QObjectPrivate *rd = QObjectPrivate::get(c->receiver.loadRelaxed());
+    rd->ensureConnectionData();
+
+    c->prev = &(rd->connections.loadRelaxed()->senders);
+    c->next = *c->prev;
+    *c->prev = c;
+    if (c->next)
+        c->next->prev = &c->next;
+}
 ```
 - 关键语句：signal_index += QMetaObjectPrivate::signalOffset(senderMetaObject);
 - 关键语句：QObjectPrivate::get(s)->addConnection(signal_index, c.get());
+- 关键语句：connectionList.first.storeRelaxed(c);、connectionList.last.loadRelaxed()->nextConnectionList.storeRelaxed(c);、connectionList.last.storeRelaxed(c);。
 
 ---
 
