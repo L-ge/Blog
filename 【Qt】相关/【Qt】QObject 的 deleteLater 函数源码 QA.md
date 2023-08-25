@@ -240,6 +240,11 @@ bool QObject::event(QEvent *e)
     ...
 }
 
+void qDeleteInEventHandler(QObject *o)
+{
+    delete o;
+}
+
 ~TestClass()
 {
     qDebug() << "TestClass dector";
