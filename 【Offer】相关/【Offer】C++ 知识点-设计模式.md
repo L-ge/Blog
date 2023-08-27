@@ -15,7 +15,7 @@
         virtual ~Product() = 0;
     }
     
-    class ConcreteProduct : public Product      // 具体工厂类
+    class ConcreteProduct : public Product      // 具体产品类
     { 
     public: 
         ConcreteProduct(); 
@@ -42,7 +42,7 @@
     }; 
     
     Factory* f = new ConcreteFactory(); 
-    Product* p = fac->CreateProduct(); 
+    Product* p = f->CreateProduct(); 
     ```
 
 2. 抽象工厂模式
@@ -656,6 +656,7 @@
             
             Flyweight* flyweight = new ConcreateFlyweight(key); 
             m_listFlyweight.push_back(flyweight); 
+            return flyweight;
         }
     private: 
         std::list<Flyweight*> m_listFlyweight; 
@@ -812,7 +813,7 @@
         }
     };
     
-    //代理：启动系统必须要权限验证,不是所以的人都可以来启动我的系统,必须要提供用户名和密码
+    //代理：启动系统必须要权限验证,不是所有的人都可以来启动我的系统,必须要提供用户名和密码
     class MySystemProxy : public AbstractCommonInterface {
     public:
         MySystemProxy(string userName, string password) {
