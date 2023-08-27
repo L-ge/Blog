@@ -74,7 +74,7 @@
     - difference_type ：两个迭代器之间的距离
     - pointer ：迭代器所指向的型别
     - reference ：迭代器所引用的型别
-    - iterator_category ：三两句说不清楚，建议看书
+    - iterator_category ：三两句说不清楚，建议看书（分类，Iterator的移动性质(有的迭代器可以++、有的可以跳着走等等)）
 - type_traits：关注的是型别的特性 ，例如这个型别是否具备non-trivial defalt ctor（默认构造函数）、non-trivial copy ctor（拷贝构造函数）、non-trivial assignment operator（赋值运算符）  和non-trivial dtor（析构函数）， 如果答案是否定的，可以采取直接操作内存的方式提高效率，一般来说， type_traits支持以下5种类型的判断：
     ```
     __type_traits<T>::has_trivial_default_constructor
@@ -408,6 +408,21 @@
 - resize执行扩容操作并且自动执行构造函数。reverse仅仅修改容量大小，及vector的capacity的大小。
 
 40. hash函数是怎么实现的？
+- 哈希表(散列表)通过将关键码映射到表中的某个位置上来存储元素，然后根据关键码来访问元素。
+- 常用的hash函数有除留余数法，线性探测，二次探测，开链法，在大部分情况下基本就是用开链法。
+- 例如有如下hash函数实现：
+	```
+	unsigned int BKDRHash(const char *str) {
+		unsigned int seed = 131; // 31 131 1313 13131 131313 etc..
+		unsigned int hash = 0;
+		while (*str) {
+			hash = hash * seed + (*str++);
+		}
+		return (hash & 0x7FFFFFFF);
+	}
+	unsigned int nFieldKey = BKDRHash(sKey.c_str());	
+	```
 
 41. 为什么你用std::map，而不用hashmap？
-时间复杂度要求不高？
+- 时间复杂度要求不高。map是O(logN)；unordered_map是平均O(1)，最坏O(N)。
+- 因为需要额外的空间存储哈希表，所以unordered_map比map使用更多的内存。
