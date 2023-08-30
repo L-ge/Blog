@@ -77,6 +77,9 @@ public:
 
     AMyUniquePtr<T>& operator=(AMyUniquePtr<T>&& other)
     {
+		if(this == &other)
+            return *this;
+			
         clean();
         m_pPtr = other.m_pPtr;
         other.m_pPtr = nullptr;
@@ -194,6 +197,9 @@ public:
 
     AMySharedPtr<T>& operator=(AMySharedPtr<T>&& other)
     {
+		if(this == &other)
+            return *this;
+			
         clean();
         m_pPtr = other.m_pPtr;
         m_pCnter = other.m_pCnter;
