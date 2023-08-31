@@ -55,7 +55,8 @@
 - tuple实现？成员变量是个tuple？
 
 16. Windows系统求CPU占用率是没有系统API的，那怎么求？
-- 计算用户态时间和内核态消耗的时间，除以时钟周期？
+- 计算用户态时间和内核态消耗的时间之和，除以时间间隔。
+- 通过 GetSystemTimes(&IdleTime, &KernelTime, &UserTime); 系统API获得总时间、内核时间、用户态时间。
 
 17. 信号槽传参，如果要传递自己定义的结构体/类/对象，需要做些什么？
 - 在main()函数中注册这种类型：qRegisterMetaType(“MyClass”);
