@@ -52,7 +52,7 @@
         	    - arg：通过地址传递来传递函数参数，这里是无符号类型指针，可以传任意类型变量的地址，在被传入函数中先强制类型转换成所需类型即可。
             - 获得线程ID：pthread_t pthread_self();
                 - 调用时，会打印线程ID。
-            - 等待线程结束： int pthread_join(pthread_t tid, void** retval);
+            - 等待线程结束：int pthread_join(pthread_t tid, void** retval);
                 - 主线程调用，等待子线程退出并回收其资源，类似于进程中wait/waitpid回收僵尸进程，调用pthread_join的线程会被阻塞。
                 - tid：创建线程时通过指针得到tid值。
                 - retval：指向返回值的指针。
