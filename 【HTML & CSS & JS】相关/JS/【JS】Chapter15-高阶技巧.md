@@ -1,3 +1,8 @@
+# 站在巨人的肩膀上
+
+> [黑马程序员前端JavaScript入门到精通全套视频教程，javascript核心进阶ES6语法、API、js高级等基础知识和实战教程](https://www.bilibili.com/video/BV1Y84y1L7Nn/)
+
+
 # （十五）高阶技巧
 
 ## 1. 深浅拷贝
