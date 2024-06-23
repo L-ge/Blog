@@ -461,3 +461,10 @@ $ git remote add origin http://bread@xxx.xxx.xxx.xxx:8080/bread/glog-0.6.0.git
 $ git remote -v
 $ git push -u origin master
 ```
+
+32. 合并远程分支
+```
+$ git status
+$ git pull
+$ git merge origin/master
+```
