@@ -468,3 +468,9 @@ $ git status
 $ git pull
 $ git merge origin/master
 ```
+
+33. pick其他提交记录
+```
+// -x 参数会代码pick记录来源的commitid
+$ git cherry-pick -x f92829dd57b8bfa84b77d6672474b95d9583beaa
+```
